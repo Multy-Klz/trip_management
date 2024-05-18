@@ -33,9 +33,18 @@
                     @foreach($trips as $key => $val)
                     <tr>
                     <th scope="row">{{++$key}}</th>
-                     <!-- Ao definir para passar as informações para a tela de index, posso acessar e      -->
-                      <!-- mostrar o nome do motorista e o modelo do veiculo     -->
-                    <th>{{ $val->driver->name }}</th>
+                    <!-- Ao definir para passar as informações para a tela de index, posso acessar e      -->
+                    <!-- mostrar o nome do motorista e o modelo do veiculo     -->
+                    <td>
+                        <!-- Itera sobre os motoristas associados a esta viagem -->
+                        @foreach($val->drivers as $driver)
+                            {{ $driver->name }}
+                            <!-- Adiciona uma vírgula e um espaço após cada nome, exceto o último -->
+                            @if (!$loop->last)
+                                -
+                            @endif
+                        @endforeach
+                    </td>
                     <th>{{ $val->vehicle->model }}</th>
                     <td>{{$val->initial_km}}</td>
                     <td>{{$val->final_km}}</td>

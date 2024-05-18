@@ -10,20 +10,20 @@ class Trip extends Model
     use HasFactory;
     ////Define os campos da Viagem que serão salvos no banco de dados
     protected $fillable = [
-        'driver_id',
         'vehicle_id',
         'initial_km',
         'final_km',
     ];
 
-    ////Relacionamento entre a viagem e o motorista e o veículo
-    public function driver()
-    {
-        return $this->belongsTo('App\Models\Driver', 'driver_id');
-    }
+//// Relacionamento entre a viagem e o veículo
+public function vehicle()
+{
+    return $this->belongsTo('App\Models\Vehicle', 'vehicle_id');
+}
 
-    public function vehicle()
-    {
-        return $this->belongsTo('App\Models\Vehicle', 'vehicle_id');
-    }
+//// Relacionamento entre a viagem e os motoristas
+public function drivers()
+{
+    return $this->belongsToMany(Driver::class, 'driver_trip');
+}
 }

@@ -27,7 +27,7 @@ class TripStore extends FormRequest
         
 
             return [
-                'driver_id' => ['required', Rule::exists('drivers', 'id')],
+                'driver_id.*' => ['required', Rule::exists('drivers', 'id')],
                 'vehicle_id' => ['required', Rule::exists('vehicles', 'id')],
                 'initial_km' => ['required', 'numeric'],
                 'final_km' => ['required', 'numeric', new TripKmRule($this->initial_km)],

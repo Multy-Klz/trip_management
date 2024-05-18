@@ -15,4 +15,9 @@ class Driver extends Model
         'birth_date',
         'cnh_number',
     ];
+
+    public function drivers()
+    {
+        return $this->belongsToMany(Driver::class);
+    }
 }

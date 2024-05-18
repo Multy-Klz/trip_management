@@ -15,7 +15,7 @@ class TripController extends Controller
     public function index()
     {
         ////Retorna todos os motoristas e veiculos e passa para a view listar as viagens e mostrar as informações relacionadas
-        $trips = Trip::with('driver', 'vehicle')->get();
+        $trips = Trip::with('drivers')->get();
         return view('trips.index', compact('trips'));
     }
 
@@ -34,18 +34,24 @@ class TripController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(TripStore $request)
-    {   
-        ////Valida os dados, buscando o ID dos motoristas e veiculos e salva a viagem
-        $driver = Driver::where('id', $request->driver_id)->first();
-        $vehicle = Vehicle::where('id', $request->vehicle_id)->first();
+{   
+   
+        // Cria uma nova viagem com os dados validados
         $trip = new Trip;
-        $trip->driver_id = $driver->id;
-        $trip->vehicle_id = $vehicle->id;
+        $trip->vehicle_id = $request->vehicle_id;
         $trip->initial_km = $request->initial_km;
         $trip->final_km = $request->final_km;
         
         $trip->save();
-
+        
+        // Verifica se driver_id é um array antes de iterar sobre ele
+        if (is_array($request->driver_id)) {
+            // Associa os motoristas à viagem
+            foreach ($request->driver_id as $driver_id) {
+                $trip->drivers()->attach($driver_id);
+            }
+        }
+        
         return redirect()->back()->withSuccess('Trip created successfully!');
     }
 
@@ -64,11 +70,14 @@ class TripController extends Controller
      */
     public function edit(string $id)
     {
-        ////carrega os motoristas e veiculos para a view de edição de viagem
-        $trip = Trip::find($id);
+        // Busca a viagem pelo id
+        $trip = Trip::with('drivers')->find($id);
+
+        // Retorna todos os motoristas e veículos
         $drivers = Driver::all();
         $vehicles = Vehicle::all();
-        
+
+        // Passa a viagem, os motoristas e os veículos para a view
         return view('trips.edit', compact('trip', 'drivers', 'vehicles'));
     }
 
@@ -78,7 +87,13 @@ class TripController extends Controller
     public function update(TripStore $request, string $id)
     {
         $input = $request->validated();
-        Trip::where('id', $id)->update($input);
+
+        // Atualiza a viagem
+        $trip = Trip::where('id', $id)->first();
+        $trip->update($input);
+    
+        // Atualiza os motoristas da viagem
+        $trip->drivers()->sync($request->driver_id);
         return redirect()->back()->withSuccess('Trip updated successfully!');
     }
 

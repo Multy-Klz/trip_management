@@ -14,7 +14,6 @@ return new class extends Migration
         ////definição do chema com regra de deleção e referência à chaves estrangeiras
         Schema::create('trips', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('driver_id')->constrained()->onDelete('cascade');
             $table->foreignId('vehicle_id')->constrained()->onDelete('cascade');
             $table->integer('initial_km');
             $table->integer('final_km');

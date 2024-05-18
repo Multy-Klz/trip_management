@@ -22,15 +22,62 @@
                 <form action="{{route('trip.store')}}" method="post">
                     @csrf
                     <div class="form-group">
-                        <label >Motorista</label>
-                        <!-- Itera e exibe todos os motorista para o usuário selecionar     -->
-                        <select name="driver_id" class="form-control">
-                            @foreach($drivers as $driver)
-                                <option value="{{ $driver->id }}" {{ old('driver_id') == $driver->id ? 'selected' : '' }}>{{ $driver->name }}</option>
-                            @endforeach
-                        </select>
+                        <label >Motorista(s)</label>
+                        <div id="drivers">
+                            <!-- Itera e exibe todos os motorista para o usuário selecionar     -->
+                            <select name="driver_id[]" class="form-control">
+                            <option value="">Selecione um motorista</option>
+                                @foreach($drivers as $driver)
+                                    <option value="{{ $driver->id }}" >{{ $driver->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <button type="button" id="add-driver" class="btn btn-primary mt-2">Adicionar mais motoristas</button>
                         @error('driver_id')<p class="alert text-danger py-0 border-none">{{ $message }}</p> @enderror
                     </div>
+                    <script>
+                            document.getElementById('add-driver').addEventListener('click', function() {
+                            var drivers = document.getElementById('drivers');
+                            var select = document.createElement('select');
+                            select.name = 'driver_id[]';
+                            select.className = 'form-control mt-2';
+
+                            // Adiciona uma opção vazia ao novo campo de seleção
+                            var emptyOption = document.createElement('option');
+                            emptyOption.value = "";
+                            emptyOption.text = "Selecione um motorista";
+                            select.appendChild(emptyOption);
+
+                            // Cria uma lista de IDs de motoristas já selecionados
+                            var selectedDrivers = Array.from(drivers.getElementsByTagName('select')).map(function(select) {
+                                return select.value;
+                            });
+
+                            var totalDrivers = @json($drivers).length;
+
+                            // Verifica se todos os motoristas já foram selecionados
+                            if (selectedDrivers.length >= totalDrivers) {
+                                // Desativa o botão de adicionar se todos os motoristas já foram selecionados
+                                this.disabled = true;
+                                return;
+                            }
+
+                            @foreach($drivers as $driver)
+                                // Verifica se o motorista já foi selecionado
+                                if (!selectedDrivers.includes("{{ $driver->id }}")) {
+                                    var option = document.createElement('option');
+                                    option.value = "{{ $driver->id }}";
+                                    option.text = "{{ $driver->name }}";
+                                    select.appendChild(option);
+                                }
+                            @endforeach
+
+                            drivers.appendChild(select);
+
+                            // Adiciona o ouvinte de evento ao novo campo de seleção
+                            addChangeListener(select);
+                        });
+                    </script>
                     <div class="form-group">
                         <label >Carro</label>
                         <!-- Itera e exibe todos os veiculos para o usuário selecionar     -->
