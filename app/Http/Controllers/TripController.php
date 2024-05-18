@@ -91,9 +91,12 @@ class TripController extends Controller
         // Atualiza a viagem
         $trip = Trip::where('id', $id)->first();
         $trip->update($input);
-    
+        
+        // Remove os motoristas duplicados
+        $uniqueDrivers = array_unique($request->driver_id);
+
         // Atualiza os motoristas da viagem
-        $trip->drivers()->sync($request->driver_id);
+        $trip->drivers()->sync($uniqueDrivers);
         return redirect()->back()->withSuccess('Trip updated successfully!');
     }
 
